@@ -6,6 +6,7 @@ function embedGoogleDriveVideo(link) {
     videoDiv.innerHTML = '';
     videoDiv.appendChild(iframe);
 }
-const driveLink = 'https://drive.google.com/file/d/1ZGmN_PuFsYWopVUEA6HgSGso8bBwrfRm/perview';
+const driveLink = 'https://drive.google.com/file/d/1ZGmN_PuFsYWopVUEA6HgSGso8bBwrfRm/preview';
 
 embedGoogleDriveVideo(driveLink);
+h
