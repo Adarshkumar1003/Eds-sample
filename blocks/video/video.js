@@ -1,4 +1,4 @@
-function embedGoogleDriveVideo(link) {
+function embedVideo(link) {
     const embedLink = link;
     const iframe = document.createElement('iframe');
     iframe.setAttribute('src', embedLink);
