@@ -15,7 +15,7 @@ import {
 import { fetchPlaceholders } from '/scripts/aem.js';
  
 // fetch placeholders from the 'en' folder
-const placeholders = await fetchPlaceholders('');
+const placeholders = await fetchPlaceholders('en');
 // retrieve the value for key 'foo'
 // const { foo } = placeholders;
 console.log(placeholders);
