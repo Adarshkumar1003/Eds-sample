@@ -14,6 +14,16 @@ async function createTableHeader(table){
     tr.append(sno);tr.append(conuntry);tr.append(capitalh);tr.append(continenth);tr.append(abbr);
     table.append(tr);
 }
+// async function createTableRow(table,row,i){
+//     let tr=document.createElement("tr");
+//     let sno=document.createElement("td");sno.appendChild(document.createTextNode(i));
+//     let conuntry=document.createElement("td");conuntry.appendChild(document.createTextNode(row.Country));
+//     let continent=document.createElement("td");continent.appendChild(document.createTextNode(row.Capital));
+//     let capital=document.createElement("td");capital.appendChild(document.createTextNode(row.Continent));
+//     let abbr=document.createElement("td");abbr.appendChild(document.createTextNode(row.Abbreviation));
+//     tr.append(sno);tr.append(conuntry);tr.append(continent);tr.append(capital);tr.append(abbr);
+//     table.append(tr);
+// }
 async function createTable(jsonURL,val) {
 
     let  pathname = null;
@@ -35,30 +45,20 @@ async function createTable(jsonURL,val) {
 
       
     });
-
+    
     return table;
 }    
-export default async function decorate(city) {
+
+export default async function decorate(block) {
     const countries = block.querySelector('a[href$=".json"]');
+    console.log(countries);
     const parientDiv=document.createElement('div');
     parientDiv.classList.add('contries-block');
 
     if (countries) {
-        parientDiv.append(await createSelectMap(countries.href));
         parientDiv.append(await createTable(countries.href,null));
         countries.replaceWith(parientDiv);
         
     }
-    const dropdown=document.getElementById('region');
-      dropdown.addEventListener('change', () => {
-        let url=countries.href;
-        if(dropdown.value!='all'){
-            url=countries.href+"?sheet="+dropdown.value;
-        }
-        const tableE=parientDiv.querySelector(":scope > table");
-        let promise = Promise.resolve(createTable(url,dropdown.value));
-        promise.then(function (val) {
-            tableE.replaceWith(val);
-        });
-      });
-  }
+    
+}
