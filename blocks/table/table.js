@@ -1,7 +1,7 @@
 import { fetchPlaceholders,getMetadata } from '../../scripts/aem.js';
 const placeholders = await fetchPlaceholders(getMetadata("locale"));
 
-const {state_name,name_of_city,total_graduates,male_graduates,female_graduates} = placeholders;
+const { allCountries,abbreviation,africa,america,asia,australia,capital,continent,countries,europe,sNo} = placeholders;
 
 
 async function createTableHeader(table){
@@ -13,38 +13,6 @@ async function createTableHeader(table){
     let abbr=document.createElement("th");abbr.appendChild(document.createTextNode(abbreviation));
     tr.append(sno);tr.append(conuntry);tr.append(capitalh);tr.append(continenth);tr.append(abbr);
     table.append(tr);
-}
-async function createTableRow(table,row,i){
-    let tr=document.createElement("tr");
-    let sno=document.createElement("td");sno.appendChild(document.createTextNode(i));
-    let conuntry=document.createElement("td");conuntry.appendChild(document.createTextNode(row.Country));
-    let continent=document.createElement("td");continent.appendChild(document.createTextNode(row.Capital));
-    let capital=document.createElement("td");capital.appendChild(document.createTextNode(row.Continent));
-    let abbr=document.createElement("td");abbr.appendChild(document.createTextNode(row.Abbreviation));
-    tr.append(sno);tr.append(conuntry);tr.append(continent);tr.append(capital);tr.append(abbr);
-    table.append(tr);
-}
-
-async function createSelectMap(jsonURL){
-    const optionsMap=new Map();
-    const { pathname } = new URL(jsonURL);
-
-    const resp = await fetch(pathname);
-    optionsMap.set("all",allCountries);optionsMap.set("asia",asia);optionsMap.set("europe",europe);optionsMap.set("africa",africa);optionsMap.set("america",america);optionsMap.set("australia",australia);
-    const select=document.createElement('select');
-    select.id = "region";
-    select.name="region";
-    optionsMap.forEach((val,key) => {
-        const option = document.createElement('option');
-        option.textContent = val;
-        option.value = key;
-        select.append(option);
-      });
-     
-     const div=document.createElement('div'); 
-     div.classList.add("region-select");
-     div.append(select);
-    return div;
 }
 async function createTable(jsonURL,val) {
 
@@ -67,11 +35,10 @@ async function createTable(jsonURL,val) {
 
       
     });
-    
+
     return table;
 }    
-
-export default async function decorate(block) {
+export default async function decorate(city) {
     const countries = block.querySelector('a[href$=".json"]');
     const parientDiv=document.createElement('div');
     parientDiv.classList.add('contries-block');
