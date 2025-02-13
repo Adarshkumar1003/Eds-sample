@@ -14,10 +14,8 @@ const {
 const rowsPerPage = 20;  
 let currentPage = 1;
 let totalPages = 1;
+let jsonData = []; 
 
-/**
- * Creates the table header
- */
 async function createTableHeader(table) {
     let tr = document.createElement("tr");
 
@@ -31,16 +29,17 @@ async function createTableHeader(table) {
     table.appendChild(tr);
 }
 
-/**
- * Creates the table rows dynamically
- */
-async function createTableRows(table, jsonData) {
-    table.innerHTML = ""; // Clear existing table content
+async function createTableRows(table, page) {
+    table.innerHTML = ""; 
 
-    jsonData.forEach((row, index) => {
+    const startIndex = (page - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, jsonData.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        let row = jsonData[i];
         let tr = document.createElement("tr");
 
-        let sno = document.createElement("td"); sno.textContent = (currentPage - 1) * rowsPerPage + index + 1;
+        let sno = document.createElement("td"); sno.textContent = i + 1;
         let country = document.createElement("td"); country.textContent = row.Country || "N/A";
         let continent = document.createElement("td"); continent.textContent = row.Continent || "N/A";
         let capital = document.createElement("td"); capital.textContent = row.Capital || "N/A";
@@ -48,37 +47,30 @@ async function createTableRows(table, jsonData) {
 
         tr.append(sno, country, continent, capital, abbr);
         table.appendChild(tr);
-    });
+    }
 }
 
-/**
- * Creates pagination controls
- */
-function createPaginationControls(parentDiv, table, jsonURL) {
+function createPaginationControls(parentDiv, table) {
     const paginationDiv = document.createElement("div");
     paginationDiv.classList.add("pagination-controls");
 
     const prevButton = document.createElement("button");
     prevButton.textContent = "Previous";
     prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener("click", async () => {
+    prevButton.addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
-            const offset = (currentPage - 1) * rowsPerPage;
-            const newTable = await createTable(jsonURL, offset, rowsPerPage);
-            parentDiv.replaceChild(newTable, table);
+            updateTable(table);
         }
     });
 
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
     nextButton.disabled = currentPage >= totalPages;
-    nextButton.addEventListener("click", async () => {
+    nextButton.addEventListener("click", () => {
         if (currentPage < totalPages) {
             currentPage++;
-            const offset = (currentPage - 1) * rowsPerPage;
-            const newTable = await createTable(jsonURL, offset, rowsPerPage);
-            parentDiv.replaceChild(newTable, table);
+            updateTable(table);
         }
     });
 
@@ -86,31 +78,26 @@ function createPaginationControls(parentDiv, table, jsonURL) {
     parentDiv.appendChild(paginationDiv);
 }
 
-/**
- * Fetches data from API using offset and limit
- */
-async function createTable(jsonURL, offset = 0, limit = 20) {
-    const urlWithParams = `${jsonURL}?offset=${offset}&limit=${limit}`;
-    const resp = await fetch(urlWithParams);
-    const json = await resp.json();
-    
-    if (!json.data || !json.totalRecords) {
-        console.error("Invalid API response format.");
-        return document.createElement("div");
-    }
+async function updateTable(table) {
+    await createTableRows(table, currentPage);
+    document.querySelector(".pagination-controls button:first-child").disabled = currentPage === 1;
+    document.querySelector(".pagination-controls button:last-child").disabled = currentPage >= totalPages;
+}
 
-    totalPages = Math.ceil(json.totalRecords / limit); // Ensure pagination is correct
+async function createTable(jsonURL) {
+    const resp = await fetch(jsonURL);
+    const json = await resp.json();
+    jsonData = json.data; 
+
+    totalPages = Math.ceil(jsonData.length / rowsPerPage);
 
     const table = document.createElement('table');
     createTableHeader(table);
-    await createTableRows(table, json.data);
+    await createTableRows(table, currentPage);
 
     return table;
 }
 
-/**
- * Decorates the block by rendering the table and pagination
- */
 export default async function decorate(block) {
     const countries = block.querySelector('a[href$=".json"]');
     if (!countries || !countries.href) {
@@ -121,9 +108,10 @@ export default async function decorate(block) {
     const parentDiv = document.createElement('div');
     parentDiv.classList.add('countries-block');
 
-    const table = await createTable(countries.href, 0, rowsPerPage);
+    const table = await createTable(countries.href);
     parentDiv.appendChild(table);
 
-    createPaginationControls(parentDiv, table, countries.href);
+    createPaginationControls(parentDiv, table);
     countries.replaceWith(parentDiv);
 }
+
