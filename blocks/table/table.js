@@ -16,7 +16,11 @@ let currentPage = 1;
 let totalPages = 1;
 let jsonData = []; 
 
-async function createTableHeader(table) {
+/**
+ * Creates the table header
+ */
+function createTableHeader(table) {
+    let thead = document.createElement("thead");
     let tr = document.createElement("tr");
 
     let sno = document.createElement("th"); sno.textContent = sNo;
@@ -26,11 +30,16 @@ async function createTableHeader(table) {
     let abbr = document.createElement("th"); abbr.textContent = abbreviation;
 
     tr.append(sno, country, continentH, capitalH, abbr);
-    table.appendChild(tr);
+    thead.appendChild(tr);
+    table.appendChild(thead);
 }
 
+/**
+ * Creates the table rows dynamically without removing the headers
+ */
 async function createTableRows(table, page) {
-    table.innerHTML = ""; 
+    let tbody = table.querySelector("tbody") || document.createElement("tbody");
+    tbody.innerHTML = "";  // Clears only table body, keeping headers intact
 
     const startIndex = (page - 1) * rowsPerPage;
     const endIndex = Math.min(startIndex + rowsPerPage, jsonData.length);
@@ -46,10 +55,15 @@ async function createTableRows(table, page) {
         let abbr = document.createElement("td"); abbr.textContent = row.Abbreviation || row.abbr || "N/A";
 
         tr.append(sno, country, continent, capital, abbr);
-        table.appendChild(tr);
+        tbody.appendChild(tr);
     }
+
+    table.appendChild(tbody);
 }
 
+/**
+ * Creates pagination controls
+ */
 function createPaginationControls(parentDiv, table) {
     const paginationDiv = document.createElement("div");
     paginationDiv.classList.add("pagination-controls");
@@ -78,12 +92,18 @@ function createPaginationControls(parentDiv, table) {
     parentDiv.appendChild(paginationDiv);
 }
 
+/**
+ * Updates the table with new data while keeping headers intact
+ */
 async function updateTable(table) {
     await createTableRows(table, currentPage);
     document.querySelector(".pagination-controls button:first-child").disabled = currentPage === 1;
     document.querySelector(".pagination-controls button:last-child").disabled = currentPage >= totalPages;
 }
 
+/**
+ * Fetches JSON data and creates the table
+ */
 async function createTable(jsonURL) {
     const resp = await fetch(jsonURL);
     const json = await resp.json();
@@ -92,12 +112,15 @@ async function createTable(jsonURL) {
     totalPages = Math.ceil(jsonData.length / rowsPerPage);
 
     const table = document.createElement('table');
-    createTableHeader(table);
+    createTableHeader(table); // Ensures the header is created
     await createTableRows(table, currentPage);
 
     return table;
 }
 
+/**
+ * Main function that initializes the table inside the block
+ */
 export default async function decorate(block) {
     const countries = block.querySelector('a[href$=".json"]');
     if (!countries || !countries.href) {
@@ -114,4 +137,3 @@ export default async function decorate(block) {
     createPaginationControls(parentDiv, table);
     countries.replaceWith(parentDiv);
 }
-
