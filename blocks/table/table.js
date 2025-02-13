@@ -1,15 +1,15 @@
 import { fetchPlaceholders, getMetadata } from '../../scripts/aem.js';
 
-Fetch placeholdersconst placeholders = await fetchPlaceholders(getMetadata("locale"));
+const placeholders = await fetchPlaceholders(getMetadata("locale"));
 
-const { 
-    allCountries = "All Countries", 
-    abbreviation = "Abbreviation", 
-    capital = "Capital", 
-    continent = "Continent", 
-    countries = "Countries", 
-    sNo = "S. No" 
-} = placeholders;
+// const { 
+//     allCountries = "All Countries", 
+//     abbreviation = "Abbreviation", 
+//     capital = "Capital", 
+//     continent = "Continent", 
+//     countries = "Countries", 
+//     sNo = "S. No" 
+// } = placeholders;
 
 const rowsPerPage = 20;  
 let currentPage = 1;
